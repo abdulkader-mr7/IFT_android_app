@@ -1,5 +1,6 @@
 package com.tamilquran.ift.controller;
 
+import com.tamilquran.ift.model.Callback;
 import com.tamilquran.ift.model.entity.VerseRow;
 import com.tamilquran.ift.model.repository.QuranRepository;
 import com.tamilquran.ift.utils.TamilNormalizer;
@@ -20,16 +21,18 @@ public class SearchController {
         return TamilNormalizer.normalize(raw);
     }
 
-    public SearchValidation validateQuery(String raw) {
-        if (raw == null || raw.trim().isEmpty()) {
-            return SearchValidation.invalid("தேடவேண்டிய சொல் ?");
-        }
-        String normalized = normalizeQuery(raw);
-        int count = repository.countSearchResults(normalized);
-        if (count == 0) {
-            return SearchValidation.invalid("தேடிய சொல் கிடைக்கவில்லை.");
-        }
-        return SearchValidation.valid(normalized, count);
+    public void validateQueryAsync(String raw, Callback<SearchValidation> callback) {
+        repository.runAsync(() -> {
+            if (raw == null || raw.trim().isEmpty()) {
+                return SearchValidation.invalid("தேடவேண்டிய சொல் ?");
+            }
+            String normalized = normalizeQuery(raw);
+            int count = repository.countSearchResults(normalized);
+            if (count == 0) {
+                return SearchValidation.invalid("தேடிய சொல் கிடைக்கவில்லை.");
+            }
+            return SearchValidation.valid(normalized, count);
+        }, callback);
     }
 
     public int getTotalPages(int count) {
@@ -43,9 +46,9 @@ public class SearchController {
         return pages;
     }
 
-    public List<VerseRow> loadPage(String query, int page) {
+    public void loadPageAsync(String query, int page, Callback<List<VerseRow>> callback) {
         int offset = (page - 1) * PAGE_SIZE;
-        return repository.searchVerses(query, offset, PAGE_SIZE);
+        repository.runAsync(() -> repository.searchVerses(query, offset, PAGE_SIZE), callback);
     }
 
     public static final class SearchValidation {

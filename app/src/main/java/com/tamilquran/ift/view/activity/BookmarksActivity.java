@@ -85,12 +85,17 @@ public class BookmarksActivity extends BaseDrawerActivity {
     }
 
     private void reloadFavorites() {
-        favorites = bookmarkController.loadFavorites();
-        adapter.submitList(favorites);
-        View empty = findViewById(R.id.empty_favorites);
-        if (empty != null) {
-            empty.setVisibility(favorites.isEmpty() ? View.VISIBLE : View.GONE);
-        }
+        bookmarkController.loadFavoritesAsync(rows -> {
+            if (isFinishing()) {
+                return;
+            }
+            favorites = rows;
+            adapter.submitList(rows);
+            View empty = findViewById(R.id.empty_favorites);
+            if (empty != null) {
+                empty.setVisibility(rows.isEmpty() ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void showAddFavoriteDialog() {
@@ -131,10 +136,10 @@ public class BookmarksActivity extends BaseDrawerActivity {
                             navigationController.openSuraDetail(row.sura, row.ayah);
                             break;
                         case 2:
-                            shareText(bookmarkController.getCopyText(row.sura, row.ayah));
+                            bookmarkController.getCopyTextAsync(row.sura, row.ayah, this::shareText);
                             break;
                         case 3:
-                            copyText(bookmarkController.getCopyText(row.sura, row.ayah));
+                            bookmarkController.getCopyTextAsync(row.sura, row.ayah, this::copyText);
                             break;
                         default:
                             break;

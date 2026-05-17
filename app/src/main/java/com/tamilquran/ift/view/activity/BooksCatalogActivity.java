@@ -23,7 +23,6 @@ import com.tamilquran.ift.view.adapter.BookListAdapter;
 import com.tamilquran.ift.view.dialog.DialogUtils;
 
 import java.io.File;
-import java.util.List;
 
 public abstract class BooksCatalogActivity extends BaseDrawerActivity implements BookListAdapter.BookActionListener {
 
@@ -61,11 +60,16 @@ public abstract class BooksCatalogActivity extends BaseDrawerActivity implements
         recyclerView.setAdapter(adapter);
 
         swipeRefresh.setOnRefreshListener(this::syncCatalog);
-        reloadBooks();
 
-        if (adapter.getCurrentList().isEmpty()) {
-            syncCatalog();
-        }
+        booksController.loadItemsAsync(items -> {
+            if (isFinishing()) {
+                return;
+            }
+            adapter.submitList(items);
+            if (items.isEmpty()) {
+                syncCatalog();
+            }
+        });
     }
 
     @Override
@@ -84,8 +88,11 @@ public abstract class BooksCatalogActivity extends BaseDrawerActivity implements
     }
 
     private void reloadBooks() {
-        List<BookItem> items = booksController.loadItems();
-        adapter.submitList(items);
+        booksController.loadItemsAsync(items -> {
+            if (!isFinishing()) {
+                adapter.submitList(items);
+            }
+        });
     }
 
     private void syncCatalog() {

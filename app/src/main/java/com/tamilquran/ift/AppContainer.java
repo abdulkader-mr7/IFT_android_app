@@ -17,7 +17,9 @@ public final class AppContainer {
     private final BookCatalogRepository bookCatalogRepository;
 
     private AppContainer(Context context) {
-        ioExecutor = Executors.newFixedThreadPool(4);
+        // Single thread: serialises DB work so a write always completes before
+        // a following read, and keeps SQLite access off the UI thread.
+        ioExecutor = Executors.newSingleThreadExecutor();
         quranRepository = new QuranRepository(context, ioExecutor);
         bookCatalogRepository = new BookCatalogRepository(context);
     }

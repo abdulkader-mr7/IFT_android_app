@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tamilquran.ift.AppContainer;
 import com.tamilquran.ift.R;
 import com.tamilquran.ift.controller.SuraController;
-import com.tamilquran.ift.model.entity.SuraHeader;
 import com.tamilquran.ift.model.entity.VerseRow;
 import com.tamilquran.ift.model.preference.PreferencesRepository;
 import com.tamilquran.ift.model.repository.QuranRepository;
@@ -35,6 +32,7 @@ public class SuraDetailActivity extends BaseDrawerActivity {
 
     private SuraController suraController;
     private VerseListAdapter adapter;
+    private RecyclerView verseList;
     private List<VerseRow> verses;
     private int suraNo;
     private int scrollPosition;
@@ -57,8 +55,8 @@ public class SuraDetailActivity extends BaseDrawerActivity {
             suraNo = 1;
         }
 
-        RecyclerView recyclerView = findViewById(R.id.suradetail_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        verseList = findViewById(R.id.suradetail_list);
+        verseList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new VerseListAdapter();
         adapter.setFontSizes(displaySettings.tamilFontSize, displaySettings.arabicFontSize);
         adapter.setOnVerseInteractionListener(new VerseListAdapter.OnVerseInteractionListener() {
@@ -72,13 +70,11 @@ public class SuraDetailActivity extends BaseDrawerActivity {
                 showVerseActionDialog(position, row);
             }
         });
-        recyclerView.setAdapter(adapter);
+        verseList.setAdapter(adapter);
 
-        loadVerses();
+        loadVerses(scrollPosition);
         updateTitle();
         updateNavButtons();
-
-        recyclerView.scrollToPosition(scrollPosition);
     }
 
     @Override
@@ -92,12 +88,20 @@ public class SuraDetailActivity extends BaseDrawerActivity {
         PreferencesRepository.DisplaySettings latest =
                 AppContainer.getInstance(this).getQuranRepository()
                         .getPreferencesRepository().getDisplaySettings();
-        if (latest.tamilFontSize != displaySettings.tamilFontSize
-                || latest.arabicFontSize != displaySettings.arabicFontSize
-                || latest.showArabic != displaySettings.showArabic
-                || latest.showTamil != displaySettings.showTamil) {
+        boolean visibilityChanged = latest.showArabic != displaySettings.showArabic
+                || latest.showTamil != displaySettings.showTamil;
+        boolean fontChanged = latest.tamilFontSize != displaySettings.tamilFontSize
+                || latest.arabicFontSize != displaySettings.arabicFontSize;
+        if (visibilityChanged || fontChanged) {
             displaySettings = latest;
-            loadVerses();
+            adapter.setFontSizes(latest.tamilFontSize, latest.arabicFontSize);
+            if (visibilityChanged) {
+                // Verse text content differs -> reload from the database.
+                loadVerses(0);
+            } else {
+                // Only the font size changed -> rebind in place, no requery.
+                adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+            }
         }
     }
 
@@ -118,14 +122,14 @@ public class SuraDetailActivity extends BaseDrawerActivity {
         }
         if (id == R.id.menu_prev) {
             suraNo--;
-            loadVerses();
+            loadVerses(0);
             updateTitle();
             updateNavButtons();
             return true;
         }
         if (id == R.id.menu_next) {
             suraNo++;
-            loadVerses();
+            loadVerses(0);
             updateTitle();
             updateNavButtons();
             return true;
@@ -138,12 +142,6 @@ public class SuraDetailActivity extends BaseDrawerActivity {
     }
 
     private void showVerseActionDialog(int position, VerseRow row) {
-        String[] actions = {
-                getString(R.string.bookmark_saved).replace("saved", "Save"),
-                getString(R.string.added_favourite),
-                "Share",
-                getString(R.string.copied).replace("Copied", "Copy")
-        };
         new AlertDialog.Builder(this)
                 .setTitle("Action")
                 .setItems(new String[]{"Bookmark", "Favourite", "Share", "Copy"}, (dialog, which) -> {
@@ -157,10 +155,10 @@ public class SuraDetailActivity extends BaseDrawerActivity {
                             Toast.makeText(this, R.string.added_favourite, Toast.LENGTH_SHORT).show();
                             break;
                         case 2:
-                            shareText(suraController.getCopyText(suraNo, row.ayah));
+                            suraController.getCopyTextAsync(suraNo, row.ayah, this::shareText);
                             break;
                         case 3:
-                            copyText(suraController.getCopyText(suraNo, row.ayah));
+                            suraController.getCopyTextAsync(suraNo, row.ayah, this::copyText);
                             break;
                         default:
                             break;
@@ -182,19 +180,22 @@ public class SuraDetailActivity extends BaseDrawerActivity {
         Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show();
     }
 
-    private void loadVerses() {
-        verses = suraController.loadSuraVerses(suraNo);
-        adapter.setFontSizes(displaySettings.tamilFontSize, displaySettings.arabicFontSize);
-        adapter.submitList(verses);
-        RecyclerView recyclerView = findViewById(R.id.suradetail_list);
-        recyclerView.scrollToPosition(0);
+    private void loadVerses(int scrollTo) {
+        suraController.loadSuraVersesAsync(suraNo, rows -> {
+            if (isFinishing()) {
+                return;
+            }
+            verses = rows;
+            adapter.submitList(rows, () -> verseList.scrollToPosition(scrollTo));
+        });
     }
 
     private void updateTitle() {
-        SuraHeader header = suraController.getSuraHeader(suraNo);
-        if (header != null && getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(header.name);
-        }
+        suraController.getSuraHeaderAsync(suraNo, header -> {
+            if (!isFinishing() && header != null && getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(header.name);
+            }
+        });
     }
 
     private void updateNavButtons() {

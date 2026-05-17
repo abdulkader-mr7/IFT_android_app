@@ -1,10 +1,13 @@
 package com.tamilquran.ift.controller;
 
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+
+import com.tamilquran.ift.model.Callback;
 import com.tamilquran.ift.model.entity.BookItem;
 import com.tamilquran.ift.model.repository.BookCatalogRepository;
 import com.tamilquran.ift.utils.NetworkUtils;
-
-import android.content.Context;
 
 import java.io.File;
 import java.util.List;
@@ -28,6 +31,7 @@ public class BooksController {
     private final Context context;
     private final BookCatalogRepository repository;
     private final BookCatalogRepository.CatalogType catalogType;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public BooksController(Context context, BookCatalogRepository.CatalogType catalogType) {
         this.context = context.getApplicationContext();
@@ -35,8 +39,12 @@ public class BooksController {
         this.catalogType = catalogType;
     }
 
-    public List<BookItem> loadItems() {
-        return repository.getBooks(catalogType);
+    /** Loads the catalog from the database off the main thread. */
+    public void loadItemsAsync(Callback<List<BookItem>> callback) {
+        new Thread(() -> {
+            List<BookItem> items = repository.getBooks(catalogType);
+            mainHandler.post(() -> callback.onResult(items));
+        }).start();
     }
 
     public boolean isOnline() {
@@ -90,26 +98,27 @@ public class BooksController {
     }
 
     public void downloadCoverImages() {
-        List<BookItem> items = loadItems();
-        for (BookItem item : items) {
-            File cover = repository.getCoverFile(catalogType, item.bookFilename);
-            if (!cover.exists()) {
-                repository.downloadFile(catalogType, item.bookFilename, ".png",
-                        new BookCatalogRepository.DownloadProgressListener() {
-                            @Override
-                            public void onProgress(int percent) {
-                            }
+        new Thread(() -> {
+            for (BookItem item : repository.getBooks(catalogType)) {
+                File cover = repository.getCoverFile(catalogType, item.bookFilename);
+                if (!cover.exists()) {
+                    repository.downloadFile(catalogType, item.bookFilename, ".png",
+                            new BookCatalogRepository.DownloadProgressListener() {
+                                @Override
+                                public void onProgress(int percent) {
+                                }
 
-                            @Override
-                            public void onComplete(File file) {
-                            }
+                                @Override
+                                public void onComplete(File file) {
+                                }
 
-                            @Override
-                            public void onError(String message) {
-                            }
-                        });
+                                @Override
+                                public void onError(String message) {
+                                }
+                            });
+                }
             }
-        }
+        }).start();
     }
 
     public File getPdfFile(String filename) {

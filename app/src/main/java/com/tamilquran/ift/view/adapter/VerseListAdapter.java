@@ -42,10 +42,14 @@ public class VerseListAdapter extends ListAdapter<VerseRow, VerseListAdapter.Ver
         this.interactionListener = listener;
     }
 
+    /**
+     * Updates the font sizes used when binding rows. Does not refresh on its
+     * own: a following submitList() binds new rows with these sizes. For an
+     * in-place size change call notifyItemRangeChanged() afterwards.
+     */
     public void setFontSizes(int tamilFontSize, int arabicFontSize) {
         this.tamilFontSize = tamilFontSize;
         this.arabicFontSize = arabicFontSize;
-        notifyDataSetChanged();
     }
 
     public void setHighlightQuery(@Nullable String highlightQuery) {

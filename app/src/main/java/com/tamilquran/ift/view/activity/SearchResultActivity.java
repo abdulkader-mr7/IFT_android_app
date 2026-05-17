@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,8 +24,6 @@ import com.tamilquran.ift.model.entity.VerseRow;
 import com.tamilquran.ift.model.preference.PreferencesRepository;
 import com.tamilquran.ift.view.adapter.VerseListAdapter;
 
-import java.util.List;
-
 public class SearchResultActivity extends BaseDrawerActivity {
 
     public static final String EXTRA_QUERY = "searchString";
@@ -35,6 +32,7 @@ public class SearchResultActivity extends BaseDrawerActivity {
     private SearchController searchController;
     private SuraController suraController;
     private VerseListAdapter adapter;
+    private RecyclerView resultList;
     private String query;
     private int totalCount;
     private int currentPage = 1;
@@ -65,8 +63,8 @@ public class SearchResultActivity extends BaseDrawerActivity {
         pageText = findViewById(R.id.pagetext);
         updatePageLabel();
 
-        RecyclerView recyclerView = findViewById(R.id.searchdeail_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        resultList = findViewById(R.id.searchdeail_list);
+        resultList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new VerseListAdapter();
         adapter.setHighlightQuery(query);
         adapter.setFontSizes(displaySettings.tamilFontSize, displaySettings.arabicFontSize);
@@ -81,7 +79,7 @@ public class SearchResultActivity extends BaseDrawerActivity {
                 showVerseActions(row);
             }
         });
-        recyclerView.setAdapter(adapter);
+        resultList.setAdapter(adapter);
         loadPage();
     }
 
@@ -99,8 +97,9 @@ public class SearchResultActivity extends BaseDrawerActivity {
         if (latest.tamilFontSize != displaySettings.tamilFontSize
                 || latest.arabicFontSize != displaySettings.arabicFontSize) {
             displaySettings = latest;
-            adapter.setFontSizes(displaySettings.tamilFontSize, displaySettings.arabicFontSize);
-            loadPage();
+            adapter.setFontSizes(latest.tamilFontSize, latest.arabicFontSize);
+            // Only the font size changed -> rebind in place, no requery.
+            adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         }
     }
 
@@ -137,12 +136,14 @@ public class SearchResultActivity extends BaseDrawerActivity {
     }
 
     private void loadPage() {
-        List<VerseRow> rows = searchController.loadPage(query, currentPage);
-        adapter.submitList(rows);
-        updatePageLabel();
-        updateNavButtons();
-        RecyclerView recyclerView = findViewById(R.id.searchdeail_list);
-        recyclerView.scrollToPosition(0);
+        searchController.loadPageAsync(query, currentPage, rows -> {
+            if (isFinishing()) {
+                return;
+            }
+            adapter.submitList(rows, () -> resultList.scrollToPosition(0));
+            updatePageLabel();
+            updateNavButtons();
+        });
     }
 
     private void updatePageLabel() {
@@ -171,9 +172,9 @@ public class SearchResultActivity extends BaseDrawerActivity {
                         suraController.addFavorite(row.sura, row.ayah);
                         Toast.makeText(this, R.string.added_favourite, Toast.LENGTH_SHORT).show();
                     } else if (which == 1) {
-                        shareText(suraController.getCopyText(row.sura, row.ayah));
+                        suraController.getCopyTextAsync(row.sura, row.ayah, this::shareText);
                     } else {
-                        copyText(suraController.getCopyText(row.sura, row.ayah));
+                        suraController.getCopyTextAsync(row.sura, row.ayah, this::copyText);
                     }
                 })
                 .show();

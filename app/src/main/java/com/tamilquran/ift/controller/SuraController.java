@@ -1,5 +1,6 @@
 package com.tamilquran.ift.controller;
 
+import com.tamilquran.ift.model.Callback;
 import com.tamilquran.ift.model.entity.SuraHeader;
 import com.tamilquran.ift.model.entity.VerseRow;
 import com.tamilquran.ift.model.repository.QuranRepository;
@@ -14,24 +15,24 @@ public class SuraController {
         this.repository = repository;
     }
 
-    public List<SuraHeader> loadSuraHeaders() {
-        return repository.getSuraHeaders();
+    public void loadSuraHeadersAsync(Callback<List<SuraHeader>> callback) {
+        repository.runAsync(repository::getSuraHeaders, callback);
     }
 
-    public List<VerseRow> loadSuraVerses(int suraNo) {
-        return repository.getSuraVerses(suraNo);
+    public void loadSuraVersesAsync(int suraNo, Callback<List<VerseRow>> callback) {
+        repository.runAsync(() -> repository.getSuraVerses(suraNo), callback);
     }
 
-    public SuraHeader getSuraHeader(int suraNo) {
-        return repository.getSuraHeader(suraNo);
+    public void getSuraHeaderAsync(int suraNo, Callback<SuraHeader> callback) {
+        repository.runAsync(() -> repository.getSuraHeader(suraNo), callback);
     }
 
-    public String getCopyText(int sura, int ayah) {
-        return repository.getCopyText(sura, ayah);
+    public void getCopyTextAsync(int sura, int ayah, Callback<String> callback) {
+        repository.runAsync(() -> repository.getCopyText(sura, ayah), callback);
     }
 
     public void addFavorite(int sura, int ayah) {
-        repository.setFavorite(sura, ayah, true);
+        repository.runOnBackground(() -> repository.setFavorite(sura, ayah, true));
     }
 
     public void saveLastRead(int sura, int listPosition) {

@@ -60,7 +60,11 @@ public class SuraIndexFragment extends BaseFragment {
                 displaySettings.tamilFontSize
         );
         recyclerView.setAdapter(adapter);
-        adapter.submitList(suraController.loadSuraHeaders());
+        suraController.loadSuraHeadersAsync(headers -> {
+            if (isAdded()) {
+                adapter.submitList(headers);
+            }
+        });
     }
 
     @Override

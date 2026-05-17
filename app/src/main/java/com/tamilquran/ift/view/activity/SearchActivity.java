@@ -35,19 +35,22 @@ public class SearchActivity extends BaseDrawerActivity {
     }
 
     private void performSearch() {
-        SearchController.SearchValidation validation =
-                searchController.validateQuery(searchInput.getText().toString());
-        if (!validation.valid) {
-            if (validation.error.contains("?")) {
-                searchInput.setError(validation.error);
-            } else {
-                showLongToast(validation.error);
+        searchController.validateQueryAsync(searchInput.getText().toString(), validation -> {
+            if (isFinishing()) {
+                return;
             }
-            return;
-        }
-        Intent intent = new Intent(this, SearchResultActivity.class);
-        intent.putExtra(SearchResultActivity.EXTRA_QUERY, validation.query);
-        intent.putExtra(SearchResultActivity.EXTRA_COUNT, validation.count);
-        startActivity(intent);
+            if (!validation.valid) {
+                if (validation.error.contains("?")) {
+                    searchInput.setError(validation.error);
+                } else {
+                    showLongToast(validation.error);
+                }
+                return;
+            }
+            Intent intent = new Intent(this, SearchResultActivity.class);
+            intent.putExtra(SearchResultActivity.EXTRA_QUERY, validation.query);
+            intent.putExtra(SearchResultActivity.EXTRA_COUNT, validation.count);
+            startActivity(intent);
+        });
     }
 }

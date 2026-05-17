@@ -1,7 +1,11 @@
 package com.tamilquran.ift.model.repository;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 
+import com.tamilquran.ift.model.Callback;
 import com.tamilquran.ift.model.database.AppDatabase;
 import com.tamilquran.ift.model.entity.SuraHeader;
 import com.tamilquran.ift.model.entity.SuraHeaderEntity;
@@ -12,13 +16,17 @@ import com.tamilquran.ift.utils.VerseFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
 public class QuranRepository {
 
+    private static final String TAG = "QuranRepository";
+
     private final AppDatabase database;
     private final PreferencesRepository preferencesRepository;
     private final ExecutorService executor;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public QuranRepository(Context context, ExecutorService executor) {
         this.database = AppDatabase.getInstance(context);
@@ -96,5 +104,23 @@ public class QuranRepository {
 
     public void runOnBackground(Runnable runnable) {
         executor.execute(runnable);
+    }
+
+    /**
+     * Runs {@code task} on the IO executor and delivers the result to
+     * {@code callback} on the main thread. If the task fails the error is
+     * logged and the callback is not invoked.
+     */
+    public <T> void runAsync(Callable<T> task, Callback<T> callback) {
+        executor.execute(() -> {
+            final T result;
+            try {
+                result = task.call();
+            } catch (Exception e) {
+                Log.e(TAG, "Background query failed", e);
+                return;
+            }
+            mainHandler.post(() -> callback.onResult(result));
+        });
     }
 }

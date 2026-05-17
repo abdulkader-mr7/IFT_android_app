@@ -1,6 +1,5 @@
 package com.tamilquran.ift.view.adapter;
 
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.tamilquran.ift.R;
 import com.tamilquran.ift.model.entity.BookItem;
 
@@ -85,12 +85,14 @@ public class BookListAdapter extends ListAdapter<BookItem, BookListAdapter.BookV
         }
 
         int placeholder = samarasam ? R.mipmap.samarasam : R.mipmap.iftbooks;
-        holder.cover.setImageResource(placeholder);
         if (coverFileResolver != null) {
-            File coverFile = coverFileResolver.getCoverFile(item.bookFilename);
-            if (coverFile.exists()) {
-                holder.cover.setImageBitmap(BitmapFactory.decodeFile(coverFile.getAbsolutePath()));
-            }
+            Glide.with(holder.cover.getContext())
+                    .load(coverFileResolver.getCoverFile(item.bookFilename))
+                    .placeholder(placeholder)
+                    .error(placeholder)
+                    .into(holder.cover);
+        } else {
+            holder.cover.setImageResource(placeholder);
         }
 
         holder.download.setOnClickListener(v -> listener.onDownloadClick(item, position));

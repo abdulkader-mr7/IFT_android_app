@@ -2,9 +2,13 @@ package com.tamilquran.ift.model.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "alquran")
+@Entity(
+        tableName = "alquran",
+        indices = {@Index("sura"), @Index("liked")}
+)
 public class VerseEntity {
 
     @PrimaryKey
