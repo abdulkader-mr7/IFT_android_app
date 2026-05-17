@@ -1,0 +1,6 @@
+<resources>
+    <style name="AppTheme" parent="Theme.IFT" />
+    <style name="AppTheme.NoActionBar" parent="Theme.IFT" />
+    <style name="AppTheme.AppBarOverlay" parent="Theme.IFT.AppBarOverlay" />
+    <style name="AppTheme.PopupOverlay" parent="Theme.IFT.PopupOverlay" />
+</resources>

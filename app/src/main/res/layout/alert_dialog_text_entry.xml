@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+  <EditText
+      android:id="@+id/surano"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="1dip"
+      android:layout_marginRight="20dip"
+      android:gravity="fill_horizontal"
+      android:hint="Sura No. (1 to 114)"
+      android:inputType="number"
+      android:scrollHorizontally="true" /><EditText
+        android:id="@+id/ayahno"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="1dip"
+        android:layout_marginRight="20dip"
+        android:gravity="fill_horizontal"
+        android:hint="Ayah No."
+        android:inputType="number"
+        android:scrollHorizontally="true" />
+
+</LinearLayout>

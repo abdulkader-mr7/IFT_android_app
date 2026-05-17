@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:icon="@mipmap/ic_find_in_page"
+        android:id="@+id/quicksarch"
+        android:title="Quick Search"
+        >
+    </item>
+    <item
+        android:icon="@mipmap/ic_bookmark"
+        android:id="@+id/gotobookmark"
+        android:title="Goto BookMark">
+
+    </item>
+</menu>

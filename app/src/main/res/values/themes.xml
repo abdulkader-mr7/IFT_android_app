@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.IFT" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/ift_purple</item>
+        <item name="colorPrimaryContainer">@color/ift_purple_light</item>
+        <item name="colorSecondary">@color/ift_green</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="android:statusBarColor">@color/ift_purple_dark</item>
+    </style>
+
+    <style name="Theme.IFT.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar" />
+    <style name="Theme.IFT.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
+
+    <style name="TextAppearance.IFT.Title" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/ift_purple</item>
+    </style>
+
+    <style name="TextAppearance.IFT.Body" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/ift_text_primary</item>
+    </style>
+</resources>

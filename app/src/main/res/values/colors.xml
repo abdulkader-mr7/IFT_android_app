@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#800080</color>
+    <color name="colorPrimaryDark">#5A005A</color>
+    <color name="colorAccent">#006600</color>
+    <color name="ift_purple">#800080</color>
+    <color name="ift_purple_dark">#5A005A</color>
+    <color name="ift_purple_light">#B366B3</color>
+    <color name="ift_green">#006600</color>
+    <color name="ift_text_primary">#FF000000</color>
+    <color name="ift_highlight">#FFFFFF00</color>
+    <color name="ift_divider">#FF0000FF</color>
+</resources>

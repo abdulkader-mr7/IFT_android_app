@@ -1,0 +1,105 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:layout_gravity="center"
+	android:orientation="vertical"
+	 >
+
+
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:paddingTop="10px">
+
+		<ImageView
+			android:id="@+id/ImageView01"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@mipmap/iftbooks" >
+		</ImageView>
+
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:paddingTop="10px"
+			>
+
+			<TextView
+				android:id="@+id/bookname"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="bookname"
+				android:paddingTop="5px"
+				android:paddingLeft="5px"
+				android:textColor="#FF0000"
+				android:shadowColor="#808080"
+				android:shadowRadius="1.5"
+				android:shadowDx="2"
+				android:shadowDy="2" />/>
+
+			<TextView
+				android:id="@+id/author"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Author"
+				android:paddingTop="5px"
+				android:paddingLeft="5px"
+				android:textColor="#000066"
+				android:shadowColor="#808080"
+				android:shadowRadius="1.5"
+				android:shadowDx="2"
+				android:shadowDy="2"
+				android:textStyle="italic" />
+				/>
+			<TextView
+				android:id="@+id/size"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Size"
+				android:paddingTop="5px"
+				android:paddingLeft="5px"
+				android:textColor="#016417"
+				android:shadowColor="#808080"
+				android:shadowRadius="1.5"
+				android:shadowDx="2"
+				android:shadowDy="2"
+				android:textStyle="italic" />
+			/>
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:paddingTop="10px">
+
+			<ImageButton
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="myClickHandler"
+				android:id="@+id/downloadbutton"
+				android:src="@mipmap/ic_file_download_black_36dp"
+				android:background="@android:color/transparent" />
+				<ImageButton
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:onClick="myDeleteButtonHandler"
+					android:id="@+id/deletebutton"
+					android:src="@mipmap/ic_delete_forever_black_36dp"
+					android:paddingLeft="30px"
+					android:layout_gravity="right"
+					android:background="@android:color/transparent" />
+			</LinearLayout>
+		</LinearLayout>
+
+
+
+
+	</LinearLayout>
+
+
+
+
+
+</LinearLayout>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item android:title="குர்ஆன்">
+        <menu>
+            <item
+                android:id="@+id/nav_suraindex"
+                android:icon="@mipmap/ic_toc_black"
+                android:title="அட்டவணை" />
+            <item
+                android:id="@+id/nav_favourite"
+                android:icon="@mipmap/ic_star_rate"
+                android:title="பிடித்தவை" />
+            <item
+                android:id="@+id/nav_search"
+                android:icon="@mipmap/ic_find_in_page"
+                android:title="தேடல்" />
+        </menu>
+    </item>
+    <item android:title="புத்தகங்கள்">
+        <menu>
+            <item
+                android:id="@+id/nav_book1"
+                android:icon="@mipmap/ic_book_black"
+                android:title="IFT புத்தகங்கள்" />
+            <item
+                android:id="@+id/nav_book2"
+                android:icon="@mipmap/ic_book_black"
+                android:title="சமரசம் இதழ்" />
+            <item
+                android:id="@+id/nav_book_play"
+                android:icon="@mipmap/ic_open_in_browser_black_24dp"
+                android:title="Google Play Books" />
+        </menu>
+    </item>
+    <item android:title="மற்றவை">
+        <menu>
+            <item
+                 android:id="@+id/nav_site"
+                android:icon="@mipmap/ic_open_in_browser_black_24dp"
+                android:title="இணையதளம்" />
+
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@mipmap/ic_settings_black_24dp"
+                android:title="Settings" />
+
+            <item
+                android:id="@+id/nav_contact"
+                android:icon="@mipmap/ic_email_black_24dp"
+                android:title="Contact Us" />
+
+            <item
+                android:id="@+id/nav_rate"
+                android:icon="@mipmap/ic_feedback_black_24dp"
+                android:title="Rate Our App" />
+        </menu>
+    </item>
+ </menu>
